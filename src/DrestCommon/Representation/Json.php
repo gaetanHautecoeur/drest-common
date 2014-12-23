@@ -33,12 +33,15 @@ class Json extends AbstractRepresentation
             if (is_object($part)) {
                 // Catch toString objects, and datetime. Note Closure's will fall into here
                 if (method_exists($part, '__toString')) {
-                    $part = $part->__toString();
+                    $part = utf8_encode($part->__toString());
                 } elseif ($part instanceof \DateTime) {
-                    $part = $part->format(\DateTime::ISO8601);
+                    $part = utf8_encode($part->format(\DateTime::ISO8601));
                 } else {
                     throw new \Exception('Invalid object type used in JSON conversion. Must be instance of \DateTime or implement __toString()');
                 }
+            }
+            if(is_string($part) && mb_detect_encoding($part, 'UTF-8', true) === false){
+                $part = utf8_encode($part);
             }
         }
     }
